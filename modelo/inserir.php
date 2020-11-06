@@ -1,7 +1,7 @@
 <?php
 
-if (empty($_POST['nome']) || empty($_POST['sobrenome'])  || empty($_POST['idade'])  ) {
-    echo 'Formulário não preenchido corretamente';
+if (isset($_POST['nome']) && isset($_POST['sobrenome']) && isset($_POST['idade'])) {
+    Contato::inserir();
 }
- var_dump($_POST);
+
 ?>
