@@ -22,6 +22,7 @@ if (isset($_GET['excluir'])) {
 
 if (isset($_GET['editar'])) {
     $usuarioform = Usuario::mostrarPorId($_GET['editar']);
+    print_r($usuarioform);
 }
 
 if (isset($_GET['l']) && $_GET['l'] == 'sair') {
@@ -45,7 +46,6 @@ if (isset($_POST['usuario']) && isset($_POST['senha'])) {
     header('location:permissoes.php');
 }
 
-print_r($_POST);
 ?>
 
 <!DOCTYPE html>
@@ -97,31 +97,31 @@ print_r($_POST);
             <td> <div class="form-check mb-4">
                     <div class="text-center mb-4"><h4>Permissões de Usuário</h4></div>
                             <div>
-                            <input class="form-check-input" type="checkbox" name="opcao[]" id="opcao" value="inserir">
+                            <input class="form-check-input" type="checkbox" name="opcao[]" id="opcao" value="inserir" <?= ($usuarioform->inserir) ? 'checked' : ''; ?>>
                                 <label class="form-check-label" for="defaultCheck1">
                                     Inserir
                                 </label>
                             </div>
                             <div>
-                                <input class="form-check-input" type="checkbox" name="opcao[]" id="opcao" value="alterar">
+                                <input class="form-check-input" type="checkbox" name="opcao[]" id="opcao" value="alterar" <?= ($usuarioform->alterar) ? 'checked' : ''; ?>>
                                 <label class="form-check-label" for="defaultCheck2">
                                     Alterar
                                 </label>
                             </div>   
                             <div> 
-                                <input class="form-check-input" type="checkbox" name="opcao[]" id="opcao" value="editar">
+                                <input class="form-check-input" type="checkbox" name="opcao[]" id="opcao" value="editar" <?= ($usuarioform->editar) ? 'checked' : ''; ?>>
                                 <label class="form-check-label" for="defaultCheck3">
                                     Editar
                                 </label>
                             </div>    
                             <div>
-                                <input class="form-check-input" type="checkbox" name="opcao[]" id="opcao" value="excluir">
+                                <input class="form-check-input" type="checkbox" name="opcao[]" id="opcao" value="excluir" <?= ($usuarioform->excluir) ? 'checked' : ''; ?>>
                                 <label class="form-check-label" for="defaultCheck4">
                                     Excluir
                                 </label>
                             </div>
                             <div>    
-                                <input class="form-check-input" type="checkbox" name="opcao[]" id="opcao" value="administrador">
+                                <input class="form-check-input" type="checkbox" name="opcao[]" id="opcao" value="administrador" <?= ($usuarioform->administrador) ? 'checked' : ''; ?>>
                                 <label class="form-check-label" for="defaultCheck5">
                                     Administrador
                                 </label>
