@@ -9,7 +9,7 @@ if ($_SESSION['impedeF5'] != md5(implode('-',$_POST))) {
     $_SESSION['impedeF5'] = md5(implode('-',$_POST));
     if (isset($_POST['usuario']) && isset($_POST['senha'])) {
     Login::autenticar();
-    Usuario::criarUsuario();
+    
     }
 }
 
@@ -18,6 +18,10 @@ Login::permissao();
 if (isset($_GET['excluir'])) {
     Usuario::excluirUsuario();
     header('location:permissoes.php');
+}
+
+if (isset($_GET['editar'])) {
+    $usuarioform = Usuario::mostrarPorId($_GET['editar']);
 }
 
 if (isset($_GET['l']) && $_GET['l'] == 'sair') {
@@ -36,6 +40,12 @@ if (isset($_GET['search']) && $_GET['search'] != NULL) {
     $usuarios = Usuario::mostrarUsuarios();
 }
 
+if (isset($_POST['usuario']) && isset($_POST['senha'])) {
+    Usuario::atualizar();
+    header('location:permissoes.php');
+}
+
+print_r($_POST);
 ?>
 
 <!DOCTYPE html>
@@ -64,7 +74,7 @@ if (isset($_GET['search']) && $_GET['search'] != NULL) {
             <a class="nav-link mr-4" href="?l=sair">Sair<span class="sr-only">(current)</span></a> 
         </ul>
     
-    <form class="form-inline my-2 my-lg-0" action="#" method="GET">
+    <form class="form-inline my-2 my-lg-0" action="#" method="get">
       <input class="form-control mr-sm-2" name="search" type="search" placeholder="Pesquisar" aria-label="Search">
       <button class="btn btn-outline-success my-2 my-sm-0" value="pesquisar" type="submit">Pesquisar</button>
     </form>
@@ -75,31 +85,66 @@ if (isset($_GET['search']) && $_GET['search'] != NULL) {
     <div class="container-fluid w-50 mt-4 card-header bg-dark text-light">
         <div class="text-center"><h4>Criação de Usuário</h4></div>
         <form class="container-fluid w-50 mt-4 card-body" method="post" action="#">
-            <input type="hidden" name="id" value="">
+            <input type="hidden" name="id" value="<?=$usuarioform->id?>">
             <div class="form-group">
                 <label for="usuario">Usuário</label>
-                <input type="text" class="form-control" id="usuario" name="usuario" placeholder="Crie um usuário">
+            <input type="text" class="form-control" id="usuario" name="usuario" value="<?php echo(isset($usuarioform->usuario))? $usuarioform->usuario : ''; ?>"  placeholder="Crie um usuário">
             </div>
-            <div class="form-group">
+            <div class="form-group mb-5">
                 <label for="exampleInputPassword1">Senha</label>
-                <input type="password" class="form-control" id="senha" name="senha" placeholder="Digite a senha">
+                <input type="password" class="form-control" id="senha" name="senha" value="<?php echo(isset($usuarioform->senha))? $usuarioform->senha : ''; ?>" placeholder="Digite a senha">
             </div>
-            <button type="submit" class="btn btn-info">Criar</button>
+            <td> <div class="form-check mb-4">
+                    <div class="text-center mb-4"><h4>Permissões de Usuário</h4></div>
+                            <div>
+                            <input class="form-check-input" type="checkbox" name="opcao[]" id="opcao" value="inserir">
+                                <label class="form-check-label" for="defaultCheck1">
+                                    Inserir
+                                </label>
+                            </div>
+                            <div>
+                                <input class="form-check-input" type="checkbox" name="opcao[]" id="opcao" value="alterar">
+                                <label class="form-check-label" for="defaultCheck2">
+                                    Alterar
+                                </label>
+                            </div>   
+                            <div> 
+                                <input class="form-check-input" type="checkbox" name="opcao[]" id="opcao" value="editar">
+                                <label class="form-check-label" for="defaultCheck3">
+                                    Editar
+                                </label>
+                            </div>    
+                            <div>
+                                <input class="form-check-input" type="checkbox" name="opcao[]" id="opcao" value="excluir">
+                                <label class="form-check-label" for="defaultCheck4">
+                                    Excluir
+                                </label>
+                            </div>
+                            <div>    
+                                <input class="form-check-input" type="checkbox" name="opcao[]" id="opcao" value="administrador">
+                                <label class="form-check-label" for="defaultCheck5">
+                                    Administrador
+                                </label>
+                            </div>
+                        </div>
+                        </td>
+    <?php if (isset($_GET['editar'])) : ?><button type="submit" name="atualizar" class="btn btn-info">Atualizar</button>
+        <a href="permissoes.php" class="btn btn-danger" name="cancelar">Cancelar</a> 
+    <?php else: ?><button type="submit" class="btn btn-primary">Criar</button><?php endif; ?>
         </form>
     </div>
     <div class="card container-fluid mt-4 w-50 bg-dark text-light">
         <div class="card-header card-title text-center">
-            <h4>Permissões</h4>
+            <h4>Lista de Usuários</h4>
         </div>
         <div class="card-body">
             <table class="table container-fluid table table-dark">
+                <form action="#" method="get">
                 <thead>
                     <tr>
                     <th scope="col">Id</th>
                     <th scope="col">Usuário</th>
-                    <?php if ($_SESSION['permissao']->editar || $_SESSION['permissao']->excluir): ?><th scope="col">Permissões</th>
-                    <?php endif; ?>
-                    <th scope="col" colspan="3">Ações</th>
+                    <th scope="col" colspan="2">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -107,45 +152,12 @@ if (isset($_GET['search']) && $_GET['search'] != NULL) {
                         <tr>
                         <td><?=$usuario->id ?></td>
                         <td><?=$usuario->usuario ?></td>
-                        <td> <div class="form-check">
-                            <div>
-                                <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
-                                <label class="form-check-label" for="defaultCheck1">
-                                    Inserir
-                                </label>
-                            </div>
-                            <div>
-                                <input class="form-check-input" type="checkbox" value="" id="defaultCheck2">
-                                <label class="form-check-label" for="defaultCheck2">
-                                    Alterar
-                                </label>
-                            </div>   
-                            <div> 
-                                <input class="form-check-input" type="checkbox" value="" id="defaultCheck3">
-                                <label class="form-check-label" for="defaultCheck3">
-                                    Editar
-                                </label>
-                            </div>    
-                            <div>
-                                <input class="form-check-input" type="checkbox" value="" id="defaultCheck4">
-                                <label class="form-check-label" for="defaultCheck4">
-                                    Excluir
-                                </label>
-                            </div>
-                            <div>    
-                                <input class="form-check-input" type="checkbox" value="" id="defaultCheck5">
-                                <label class="form-check-label" for="defaultCheck5">
-                                    Administrador
-                                </label>
-                            </div>
-                        </div>
-                        </td>
-                        <td><a class="btn btn-info justify-content-center" name="salvar" href="?salvar=<?=$usuario->id?>">Salvar</a></td>
                         <td><a class="btn btn-warning justify-content-center" name="editar" href="?editar=<?=$usuario->id?>">Editar</a></td>
-                        <td><a class="btn btn-danger justify-content-center" name="excluir" href="?excluir=<?=$usuario->id?>">Excluir</a></td>
+                        <td><a class="btn btn-danger justify-content-center" name="excluir" onclick="return confirm('Deseja mesmo excluir este usuário?')" href="?excluir=<?=$usuario->id?>">Excluir</a></td>
                         </tr>
                     <?php } ?>
                 </tbody>
+                </form>
             </table>   
         </div>
     </div>

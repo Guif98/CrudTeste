@@ -32,7 +32,7 @@
 		</div> <!-- input-group.// -->
 		</div> <!-- form-group// -->
 		<div class="form-group">
-		<button type="submit" class="btn btn-primary btn-block"> Entrar  </button>
+		<input type="submit" class="btn btn-primary btn-block" value="Entrar"/>
 		</div> <!-- form-group// -->
 		<p class="text-center"><a href="#" class="btn text-light">Esqueceu sua senha?</a></p>
 		</form>

@@ -1,11 +1,11 @@
 <?php
     ini_set('display_errors', '1');
     error_reporting(E_ALL);
-    
     require_once('database/Conexao.php');
     require_once('controle/Contato.php'); 
-    require_once('controle/Login.php');      
-    session_start();
+    require_once('controle/Login.php');  
+    session_start();    
+    
 
     if (isset($_POST['usuario']) && isset($_POST['senha'])) {
         Login::autenticar();
@@ -15,9 +15,11 @@
 
     if (isset($_GET['l']) && $_GET['l'] == 'sair') {
         $_SESSION['login'] = false;
+        unset($_SESSION);
     }
 
     if (isset($_SESSION['login']) && $_SESSION['login']) {
+    
         
     } else {
         header('location:login.php');
@@ -116,7 +118,8 @@
             </div>
         </div>
         <?php if (isset($_GET['editar'])): ?>
-            <button type="submit" class="btn btn-info" name="atualizar">Atualizar</button> 
+            <button type="submit" class="btn btn-info" name="atualizar">Atualizar</button>
+            <a href="index.php" class="btn btn-danger" name="cancelar">Cancelar</a> 
         <?php else: ?>
         <?php if ($_SESSION['permissao']->inserir): ?><button type="submit" class="btn btn-primary">Salvar</button><?php endif; ?>
         <?php endif; ?>

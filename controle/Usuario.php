@@ -5,21 +5,26 @@ class Usuario
     public static function mostrarUsuarios() 
     {
         $db = Conexao::connect();
-        $stmt = $db->prepare("SELECT * FROM usuarios");
+        $stmt = $db->prepare("SELECT usuarios.id, usuario, inserir, alterar, editar, excluir, administrador FROM usuarios LEFT JOIN permissao ON usuarios.id = permissao.usuario_id ");
         $stmt->execute(array());
         $usuarios = $stmt->fetchAll(PDO::FETCH_OBJ);
         return $usuarios;
     }
 
     public static function mostrarPorId($id) {
-        $db = Conexao::connect();
-        $stmt = $db->prepare("SELECT usuario FROM usuarios WHERE id = ?");
-        //$stmt->bindParam(':id', $id);
-        $stmt->execute(array(
-            $id
-        ));
-        $usuario = $stmt->fetch(PDO::FETCH_OBJ);
-        return $usuario;
+        try {
+            $db = Conexao::connect();
+            $stmt = $db->prepare("SELECT usuarios.id, usuario, senha, inserir, alterar, editar, excluir, administrador FROM usuarios LEFT JOIN permissao ON usuarios.id = permissao.usuario_id WHERE usuarios.id = ?");
+            //$stmt->bindParam(':id', $id);
+            $stmt->execute(array(
+                $id
+            ));
+            $usuario = $stmt->fetch(PDO::FETCH_OBJ);
+            return $usuario;
+        } catch (\PDOException $th) {
+            echo $th->getMessage();
+        }
+        
     }
 
     public static function pesquisar() {
@@ -73,5 +78,61 @@ class Usuario
             echo "Error: " , $th->getMessage();
         }
         
+    }
+
+    public static function atualizar()
+    {  
+            $id = $_POST['id'];
+            $usuario = $_POST['usuario'];
+            $senha = $_POST['senha'];
+            $inserir = $_POST['opcao'];
+            $alterar = $_POST['opcao'];
+            $editar = $_POST['opcao'];
+            $excluir = $_POST['opcao'];
+            $administrador = $_POST['opcao'];
+            $db = Conexao::connect();
+            print_r(implode('=?,', $_POST['opcao']));
+            exit;
+            if (strlen($id)>1) {
+                $stmt = $db->prepare("UPDATE usuarios SET usuario=?, senha=? WHERE id = ?");
+                $stmt->execute(array(
+                $usuario, $senha, $id
+            ));
+                $stmt = $db->prepare("UPDATE permissao SET inserir=?, alterar=?, editar=?, excluir=?, administrador=? WHERE usuario_id = ?");
+                $stmt->execute(array(
+                    $inserir, $alterar, $editar, $excluir, $administrador, $id
+                ));
+            }
+            else {
+                $stmt = $db->prepare("INSERT INTO  usuarios(usuario, senha) VALUES (?,?)");
+                $stmt->execute(array(
+                    $usuario, $senha
+                ));
+                $stmt = $db->prepare("INSERT INTO  permissao(inserir, alterar, editar, excluir, administrador) VALUES (?,?,?,?,?)");
+                $stmt->execute(array(
+                    $inserir, $alterar, $editar, $excluir, $administrador
+                ));
+            }
+    }
+
+    public static function salvar()
+    {
+        try {
+                $id = $_POST['id'];
+                $inserir = $_POST['opcao'];
+                $alterar = $_POST['opcao'];
+                $editar = $_POST['opcao'];
+                $excluir = $_POST['opcao'];
+                $administrador = $_POST['opcao'];
+                $db = Conexao::connect();
+                $stmt = $db->prepare("UPDATE permissao SET inserir=?, alterar=?, editar=?, excluir=?, administrador=? WHERE usuario_id=?");
+                $stmt->execute(array(
+                    $inserir, $alterar, $editar, $excluir, $administrador, $id
+                ));
+        } catch (\PDOException $th) {
+            echo "Error: ", $th->getMessage();
+        }
+        
+
     }
 }
